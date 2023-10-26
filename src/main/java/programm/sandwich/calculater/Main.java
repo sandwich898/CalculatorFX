@@ -77,6 +77,8 @@ public class Main extends Application {
             b.setLayoutX(i * buttonWidth);
             b.setLayoutY(j * buttonHeight);
 
+            //Hallo
+
             i++;
 
             if(i == rows) {
