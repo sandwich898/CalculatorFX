@@ -1,11 +1,13 @@
 package programm.sandwich.calculater;
 
 import javafx.application.Application;
-import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -65,17 +67,23 @@ public class Main extends Application {
         }
         return buttonList;
     }
-    private void setButton(double windowWidth, double windowHeight, List<Button> buttons) {
+    private void setPostions(double windowWidth, double windowHeight, List<Button> buttons, TextField textField) {
         double buttonWidth = windowWidth / rows;
-        double buttonHeight = windowHeight / columns;
+        double buttonHeight = windowHeight / (columns  + 1);
+
+        textField.setStyle("-fx-font-size: " + ((buttonHeight/10) * 3) + "px;");
+        textField.setPrefSize(windowWidth, buttonHeight);
+        textField.setLayoutX(0);
+        textField.setLayoutY(0);
 
         int i = 0;
-        int j = 0;
+        int j = 1;
         for (Button b: buttons) {
             b.setPrefSize(buttonWidth, buttonHeight);
 
             b.setLayoutX(i * buttonWidth);
             b.setLayoutY(j * buttonHeight);
+
 
             i++;
 
@@ -89,8 +97,11 @@ public class Main extends Application {
     public void start(Stage stage) {
         List<Button> allButtons = buildButtons();
 
+        TextField textField = new TextField();
+        textField.setAlignment(Pos.CENTER_RIGHT);
+
         ChangeListener<Number> windowChange = (observable, oldValue, newValue) -> {
-            setButton(stage.getScene().getWidth(), stage.getScene().getHeight(), allButtons);
+            setPostions(stage.getScene().getWidth(), stage.getScene().getHeight(), allButtons, textField);
         };
 
         //Hier ist noch ein Fehler, wenn das Fenster durch den MAXIMAL button vergrößert wird, paßen sich die Buttons nicht mit an.
@@ -99,8 +110,9 @@ public class Main extends Application {
         stage.heightProperty().addListener(windowChange);
 
         root.getChildren().addAll(allButtons);
+        root.getChildren().add(textField);
 
-        stage.setTitle("Calculator");
+        stage.setTitle("CalculatorFX");
         stage.setScene(scene);
         stage.show();
     }
