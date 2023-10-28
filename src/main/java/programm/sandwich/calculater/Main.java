@@ -7,7 +7,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
-import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -93,6 +92,50 @@ public class Main extends Application {
             }
         }
     }
+    private void buttonFunction(List<Button> buttons, TextField output) {
+        for (Button b: buttons) {
+
+            int digitNumber;
+            if(b.getId().startsWith("digit")) {
+                digitNumber = Integer.parseInt(b.getId().substring(b.getId().length() - 1));
+                b.setOnMousePressed(event -> {
+                    output.setText(output.getText() + digitNumber);
+                });
+            } else {
+                digitNumber = 0;
+            }
+
+            switch (b.getId()) {
+                case "addition" -> {
+                    b.setOnMousePressed(e -> {
+                        if(isLastIndexANumber(output.getText()))
+                            output.setText(output.getText() + "+");
+                    });
+                }
+                case "subtraction" -> {
+                    b.setOnMousePressed(e -> {
+                        if(isLastIndexANumber(output.getText()))
+                            output.setText(output.getText() + "-");
+                    });
+                }
+                case "multiplication" -> {
+                    b.setOnMousePressed(e -> {
+                        if(isLastIndexANumber(output.getText()))
+                            output.setText(output.getText() + "*");
+                    });
+                }
+                case "divided" -> {
+                    b.setOnMousePressed(e -> {
+                        if(isLastIndexANumber(output.getText()))
+                            output.setText(output.getText() + "/");
+                    });
+                }
+            }
+        }
+    }
+    private boolean isLastIndexANumber(String s) {
+        return !(s.endsWith("+") || s.endsWith("-") || s.endsWith("*") || s.endsWith("/"));
+    }
     @Override
     public void start(Stage stage) {
         List<Button> allButtons = buildButtons();
@@ -100,9 +143,17 @@ public class Main extends Application {
         TextField textField = new TextField();
         textField.setAlignment(Pos.CENTER_RIGHT);
 
+        buttonFunction(allButtons, textField);
+
         ChangeListener<Number> windowChange = (observable, oldValue, newValue) -> {
             setPostions(stage.getScene().getWidth(), stage.getScene().getHeight(), allButtons, textField);
         };
+
+        String one = "test";
+
+        System.out.println("Test 2: :)");
+        System.out.println("String: " + one);
+        System.out.println("Letzer Char: " + one.substring(one.length() - 1));
 
         //Hier ist noch ein Fehler, wenn das Fenster durch den MAXIMAL button vergrößert wird, paßen sich die Buttons nicht mit an.
         // Das gleiche, wenn man die das Fenster an den Rand schiebt und es sich automatisch ganz lang macht!
