@@ -66,6 +66,7 @@ public class Main extends Application {
         }
         return buttonList;
     }
+
     private void setPostions(double windowWidth, double windowHeight, List<Button> buttons, TextField textField) {
         double buttonWidth = windowWidth / rows;
         double buttonHeight = windowHeight / (columns  + 1);
@@ -80,7 +81,7 @@ public class Main extends Application {
 
             b.setLayoutX(i * buttonWidth);
             b.setLayoutY(j * buttonHeight);
-            
+
             i++;
             if(i == rows) {
                 j++;
@@ -88,6 +89,7 @@ public class Main extends Application {
             }
         }
     }
+
     private void buttonFunction(List<Button> buttons, TextField output) {
         for (Button b: buttons) {
 
@@ -129,9 +131,11 @@ public class Main extends Application {
             }
         }
     }
+
     private boolean isLastIndexANumber(String s) {
         return !(s.endsWith("+") || s.endsWith("-") || s.endsWith("*") || s.endsWith("/"));
     }
+
     @Override
     public void start(Stage stage) {
         List<Button> allButtons = buildButtons();
@@ -147,7 +151,7 @@ public class Main extends Application {
         };
 
         //Hier ist noch ein Fehler, wenn das Fenster durch den MAXIMAL button vergrößert wird, paßen sich die Buttons nicht mit an.
-        // Das gleiche, wenn man die das Fenster an den Rand schiebt und es sich automatisch ganz lang macht!
+        //Das gleiche, wenn man die das Fenster an den Rand schiebt und es sich automatisch ganz lang macht!
         stage.widthProperty().addListener(windowChange);
         stage.heightProperty().addListener(windowChange);
 
