@@ -14,19 +14,18 @@ import java.util.List;
 
 public class Main extends Application {
 
-    private final short columns = 5;
-    private final short rows = 4;
+    private final short columns = 5, rows = 4;
     private final Pane root = new Pane();
     private final Scene scene = new Scene(root, 320, 590);
 
     private List<Button> buildButtons() {
 
         List<Button> buttonList = new ArrayList<>();
+        Button[] digitButtons = new Button[10];
 
         for(int i = 0; i < 20; i++)
             buttonList.add(new Button());
 
-        Button[] digitButtons = new Button[10];
         buttonList.set(0, new Button("C"));
         buttonList.get(0).setId("deleteAll");
         buttonList.set(1, new Button("CE"));
@@ -49,6 +48,7 @@ public class Main extends Application {
         buttonList.get(16).setId("negativ");
 
         for (int i = 0; i < digitButtons.length; i++) {
+            //i toString?
             digitButtons[i] = new Button("" + i);
             digitButtons[i].setId("digit:" + i);
 
@@ -72,8 +72,6 @@ public class Main extends Application {
 
         textField.setStyle("-fx-font-size: " + ((buttonHeight/10) * 3) + "px;");
         textField.setPrefSize(windowWidth, buttonHeight);
-        textField.setLayoutX(0);
-        textField.setLayoutY(0);
 
         int i = 0;
         int j = 1;
@@ -82,10 +80,8 @@ public class Main extends Application {
 
             b.setLayoutX(i * buttonWidth);
             b.setLayoutY(j * buttonHeight);
-
-
+            
             i++;
-
             if(i == rows) {
                 j++;
                 i = 0;
@@ -141,6 +137,7 @@ public class Main extends Application {
         List<Button> allButtons = buildButtons();
 
         TextField textField = new TextField();
+        textField.setPostions(0, 0);
         textField.setAlignment(Pos.CENTER_RIGHT);
 
         buttonFunction(allButtons, textField);
@@ -148,12 +145,6 @@ public class Main extends Application {
         ChangeListener<Number> windowChange = (observable, oldValue, newValue) -> {
             setPostions(stage.getScene().getWidth(), stage.getScene().getHeight(), allButtons, textField);
         };
-
-        String one = "test";
-
-        System.out.println("Test 2: :)");
-        System.out.println("String: " + one);
-        System.out.println("Letzer Char: " + one.substring(one.length() - 1));
 
         //Hier ist noch ein Fehler, wenn das Fenster durch den MAXIMAL button vergrößert wird, paßen sich die Buttons nicht mit an.
         // Das gleiche, wenn man die das Fenster an den Rand schiebt und es sich automatisch ganz lang macht!
