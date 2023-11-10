@@ -9,8 +9,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Main extends Application {
 
@@ -48,8 +47,7 @@ public class Main extends Application {
         buttonList.get(16).setId("negativ");
 
         for (int i = 0; i < digitButtons.length; i++) {
-            //i toString?
-            digitButtons[i] = new Button("" + i);
+            digitButtons[i] = new Button(String.valueOf(i));
             digitButtons[i].setId("digit:" + i);
 
             switch (i) {
@@ -65,6 +63,76 @@ public class Main extends Application {
             }
         }
         return buttonList;
+    }
+
+    //Jetzige Calculate Methode mit Konsolen output. Nicht vergessen diese raus zu machen! :)
+    private String calculate(String invoice) {
+        Stack<Double> numbers = new Stack<>();
+        boolean exesiedADot = invoice.contains(".");
+
+        System.out.println("Rechnung bearbeitung. Input String = " + invoice);
+
+        String number = "";
+        for (int i = 0; i < invoice.length(); i++) {
+            System.out.println("String pos: " + invoice.charAt(i));
+            switch (invoice.charAt(i)) {
+                case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' -> {
+                    System.out.println("Symbole wurde erkannt und zur Nummer hinzugefügt!");
+                    number += invoice.charAt(i);
+                }
+                case '+', '-', '*', '/' -> {
+
+                    if(i == 0)
+                        return "ERROR";
+
+                    if(Double.parseDouble(number) >= 900000000)
+                        return "ERROR";
+                    else
+                        numbers.push(Double.parseDouble(number));
+                    System.out.println("Normale nummer beim umwandeln in Double: " + number);
+                    System.out.println("Nach dem Umwandeln: " + Double.parseDouble(number));
+                    number = "";
+                }
+            }
+            if(i == invoice.length() - 1) {
+                if(Double.parseDouble(number) >= 900000000)
+                    return "ERROR";
+                else
+                    numbers.push(Double.parseDouble(number));
+                System.out.println("Normale nummer beim umwandeln in Double: " + number);
+                System.out.println("Nach dem Umwandeln: " + Double.parseDouble(number));
+                number = "";
+            }
+
+        }
+
+
+        double resault = 0;
+        for (int j = 1, i = 0; i < invoice.length(); i++) {
+            System.out.println("String zur jetzt berechnen pos: " + invoice.charAt(i));
+            switch (invoice.charAt(i)) {
+                case '+' -> {
+                    if(j == 1)
+                        resault = numbers.pop() + numbers.pop();
+                    else
+                        resault = resault + numbers.pop();
+                    j++;
+                }
+                case '-' -> {
+                    if(j == 1)
+                        resault = numbers.pop() - numbers.pop();
+                    else
+                        resault = resault - numbers.pop();
+                    j++;
+                }
+            }
+        }
+
+        System.out.println("Heraus gearbeitet Nummern sind: " + numbers.toString());
+
+        if(resault == (int) resault)
+            return String.valueOf(Math.round(resault));
+        else return String.valueOf(resault);
     }
 
     private void setPostions(double windowWidth, double windowHeight, List<Button> buttons, TextField textField) {
@@ -128,12 +196,35 @@ public class Main extends Application {
                             output.setText(output.getText() + "/");
                     });
                 }
+                case "dot" -> {
+                    b.setOnMousePressed(e -> {
+                        if(canIWriteADot(output.getText()))
+                            output.setText(output.getText() + ".");
+                    });
+                }
+                case "equals" -> {
+                    b.setOnMousePressed(e -> {
+                        output.setText(calculate(output.getText()));
+                    });
+                }
             }
         }
     }
 
     private boolean isLastIndexANumber(String s) {
-        return !(s.endsWith("+") || s.endsWith("-") || s.endsWith("*") || s.endsWith("/"));
+        return !(s.endsWith("+") || s.endsWith("-") || s.endsWith("*") || s.endsWith("/") || s.endsWith("."));
+    }
+
+    private boolean canIWriteADot(String s) {
+        if(!s.isEmpty() && isLastIndexANumber(s)) {
+            for (int i = s.length() - 1; i > 1; i--) {
+                if(s.charAt(i) == '+' || s.charAt(i) == '-' || s.charAt(i) == '*' || s.charAt(i) == '/')
+                    return true;
+                else if(s.charAt(i) == '.')
+                    return false;
+            }
+        } else return false;
+        return true;
     }
 
     @Override
@@ -141,7 +232,8 @@ public class Main extends Application {
         List<Button> allButtons = buildButtons();
 
         TextField textField = new TextField();
-        textField.setPostions(0, 0);
+        textField.setLayoutY(0);
+        textField.setLayoutX(0);
         textField.setAlignment(Pos.CENTER_RIGHT);
 
         buttonFunction(allButtons, textField);
@@ -154,6 +246,9 @@ public class Main extends Application {
         //Das gleiche, wenn man die das Fenster an den Rand schiebt und es sich automatisch ganz lang macht!
         stage.widthProperty().addListener(windowChange);
         stage.heightProperty().addListener(windowChange);
+
+        System.out.println("Test");
+        System.out.println("Double Max Value: " + Double.MAX_VALUE);
 
         root.getChildren().addAll(allButtons);
         root.getChildren().add(textField);
