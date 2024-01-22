@@ -65,76 +65,6 @@ public class Main extends Application {
         return buttonList;
     }
 
-    //Jetzige Calculate Methode mit Konsolen output. Nicht vergessen diese raus zu machen! :)
-    private String calculate(String invoice) {
-        Stack<Double> numbers = new Stack<>();
-        boolean exesiedADot = invoice.contains(".");
-
-        System.out.println("Rechnung bearbeitung. Input String = " + invoice);
-
-        String number = "";
-        for (int i = 0; i < invoice.length(); i++) {
-            System.out.println("String pos: " + invoice.charAt(i));
-            switch (invoice.charAt(i)) {
-                case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' -> {
-                    System.out.println("Symbole wurde erkannt und zur Nummer hinzugefügt!");
-                    number += invoice.charAt(i);
-                }
-                case '+', '-', '*', '/' -> {
-
-                    if(i == 0)
-                        return "ERROR";
-
-                    if(Double.parseDouble(number) >= 900000000)
-                        return "ERROR";
-                    else
-                        numbers.push(Double.parseDouble(number));
-                    System.out.println("Normale nummer beim umwandeln in Double: " + number);
-                    System.out.println("Nach dem Umwandeln: " + Double.parseDouble(number));
-                    number = "";
-                }
-            }
-            if(i == invoice.length() - 1) {
-                if(Double.parseDouble(number) >= 900000000)
-                    return "ERROR";
-                else
-                    numbers.push(Double.parseDouble(number));
-                System.out.println("Normale nummer beim umwandeln in Double: " + number);
-                System.out.println("Nach dem Umwandeln: " + Double.parseDouble(number));
-                number = "";
-            }
-
-        }
-
-
-        double resault = 0;
-        for (int j = 1, i = 0; i < invoice.length(); i++) {
-            System.out.println("String zur jetzt berechnen pos: " + invoice.charAt(i));
-            switch (invoice.charAt(i)) {
-                case '+' -> {
-                    if(j == 1)
-                        resault = numbers.pop() + numbers.pop();
-                    else
-                        resault = resault + numbers.pop();
-                    j++;
-                }
-                case '-' -> {
-                    if(j == 1)
-                        resault = numbers.pop() - numbers.pop();
-                    else
-                        resault = resault - numbers.pop();
-                    j++;
-                }
-            }
-        }
-
-        System.out.println("Heraus gearbeitet Nummern sind: " + numbers.toString());
-
-        if(resault == (int) resault)
-            return String.valueOf(Math.round(resault));
-        else return String.valueOf(resault);
-    }
-
     private void setPostions(double windowWidth, double windowHeight, List<Button> buttons, TextField textField) {
         double buttonWidth = windowWidth / rows;
         double buttonHeight = windowHeight / (columns  + 1);
@@ -204,7 +134,25 @@ public class Main extends Application {
                 }
                 case "equals" -> {
                     b.setOnMousePressed(e -> {
-                        output.setText(calculate(output.getText()));
+
+
+                        //Calculate.start("190/10+10/2*3-10+6*7-9+36/6+50/5*3");
+                        //Calculate.start("4+5+3");
+                        //calculate("12+1/2+3");
+
+                        output.setText(Calculate.start(output.getText()));
+                    });
+                }
+                case "deleteAll" -> {
+                    b.setOnMousePressed(e -> {
+                        output.setText("");
+                    });
+                }
+                case "delete" -> {
+                    b.setOnMousePressed(e -> {
+
+                        if(!output.getText().isEmpty())
+                            output.setText(output.getText().substring(0, output.getText().length() - 1));
                     });
                 }
             }
@@ -249,6 +197,10 @@ public class Main extends Application {
 
         System.out.println("Test");
         System.out.println("Double Max Value: " + Double.MAX_VALUE);
+        System.out.println("Prozen Symbol: " + -34204 % 1);
+        String d = "Hall o o o";
+        System.out.println("Vor trim: " + d);
+        System.out.println("Nach replaceAll: " + d.replaceAll(" ", ""));
 
         root.getChildren().addAll(allButtons);
         root.getChildren().add(textField);
