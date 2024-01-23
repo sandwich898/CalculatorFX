@@ -227,5 +227,9 @@ ACHTUNG WICHTIGES PROBLEM: Im moment wird von rechts nach links gerechnet, jedoc
 
 1. Komme rechnung
 2. Klammer rechnung
+	-Drauf achten das wenn vor der Klammer eine Zahl steht ohne Operator daneben, wird die klamer mit der Zahl Mal gerechent
+	-Klamern werden als neuen Invoice gebaut und extra ausgerchenet, wenn dan noch eine Klamer drin ist wieder eine Neue rechnung. Das ergebnis wird dann einfach für die ganze Klamer ersetzt
+	-Überprüfen ob es Klammern gibt, ob die erste Klammer eine Klammer auf ist und ob es danch eine Klammer zu exestirt
+	-Überprüfen ob in der Klammer auch eine Rechnung steht, nicht nur eine Zahl
 3. Minus rechung
  */
