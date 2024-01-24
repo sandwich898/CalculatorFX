@@ -1,132 +1,22 @@
 package programm.sandwich.calculater;
 
-import java.util.regex.Pattern;
-
 public class Calculate {
 
     public static String start(String invoice) {
         StringBuilder newIn = new StringBuilder();
-        boolean lastTimeCalculate;
+        boolean stopCalculate;
         char[] inArray;
 
         invoice = invoice.replaceAll(" ", "");
+        if (invoice.endsWith("="))
+            invoice = invoice.replaceAll("=", "");
 
         System.out.println("Input Invoice: " + invoice);
 
-        if(invoice.matches("[0-9+\\-*/().]+")) {
+        if(invoice.matches("[0-9+\\-*/().]+") && isInputAInvoice(invoice)) {
 
-            while (containsAOperator(invoice) && !containsASingleNumber(invoice)) {
-                lastTimeCalculate = false;
-                newIn.delete(0, newIn.length());
-                inArray = invoice.toCharArray();
-
-                if (invoice.contains("/")) {
-                    for (int i = inArray.length - 1; i > -1; i--) {
-                        switch (inArray[i]) {
-                            case '/' -> {
-                                newIn.insert(0, doubleToString(Double.parseDouble(getNumber1(i, inArray).toString()) / Double.parseDouble(getNumber2(i, inArray).toString())));
-
-                                int nextOperator = getNextOperatorPostion(i, inArray);
-                                if(nextOperator != -1)
-                                    newIn.insert(0, inArray[nextOperator]);
-
-                                lastTimeCalculate = true;
-                            }
-                            case '+', '-', '*' -> {
-                                if(!lastTimeCalculate) {
-                                    newIn.insert(0, getNumber2(i , inArray));
-                                    newIn.insert(0, inArray[i]);
-                                } else
-                                    lastTimeCalculate = false;
-                            }
-                        }
-                        if (!lastTimeCalculate && i == 0)
-                            newIn.insert(0, getNumber2(i , inArray));
-
-                    }
-                } else if (invoice.contains("*")) {
-                    for (int i = inArray.length - 1; i > -1; i--) {
-                        switch (inArray[i]) {
-                            case '*' -> {
-                                newIn.insert(0, doubleToString(Double.parseDouble(getNumber1(i, inArray).toString()) * Double.parseDouble(getNumber2(i, inArray).toString())));
-
-                                int nextOperator = getNextOperatorPostion(i, inArray);
-                                if(nextOperator != -1)
-                                    newIn.insert(0, inArray[nextOperator]);
-
-                                lastTimeCalculate = true;
-                            }
-                            case '+', '-', '/' -> {
-                                if(!lastTimeCalculate) {
-                                    newIn.insert(0, getNumber2(i , inArray));
-                                    newIn.insert(0, inArray[i]);
-                                } else
-                                    lastTimeCalculate = false;
-                            }
-                        }
-                        if (!lastTimeCalculate && i == 0)
-                            newIn.insert(0, getNumber2(i , inArray));
-
-                    }
-                } else if (invoice.contains("+") || invoice.contains("-")) {
-                    for (int i = inArray.length - 1; i > -1; i--) {
-                        switch (inArray[i]) {
-                            case '+' -> {
-
-                                double result = Double.parseDouble(getNumber1(i, inArray).toString()) + Double.parseDouble(getNumber2(i, inArray).toString());
-                                int nextOperator = getNextOperatorPostion(i, inArray);
-
-                                if(result < 0) {
-                                    if (inArray[nextOperator] == '-') {
-                                        result = Math.abs(result);
-                                        nextOperator = -2;
-                                    } else if (inArray[nextOperator] == '+') {
-                                        nextOperator = -1;
-                                    }
-                                }
-
-                                newIn.insert(0, doubleToString(result));
-
-                                if (nextOperator == -2)
-                                    newIn.insert(0, "+");
-                                else if (nextOperator != -1)
-                                    newIn.insert(0, inArray[nextOperator]);
-
-                                i = getNextOperatorPostion(i, inArray) - 1;
-                            }
-                            case '-' -> {
-                                if(i != 0) {
-
-                                    double result = Double.parseDouble(getNumber1(i, inArray).toString()) - Double.parseDouble(getNumber2(i, inArray).toString());
-                                    int nextOperator = getNextOperatorPostion(i, inArray);
-
-                                    if(result < 0 && nextOperator != -1) {
-                                        if (inArray[nextOperator] == '-') {
-                                            result = -(result);
-                                            nextOperator = -2;
-                                        } else if (inArray[nextOperator] == '+') {
-                                            nextOperator = -1;
-                                        }
-                                    }
-
-                                    newIn.insert(0, doubleToString(result));
-
-                                    if (nextOperator == -2)
-                                        newIn.insert(0, "+");
-                                    else if (nextOperator != -1)
-                                        newIn.insert(0, inArray[nextOperator]);
-
-                                    i = getNextOperatorPostion(i, inArray) - 1;
-                                }
-                            }
-                        }
-
-                        if (i == 0)
-                            newIn.insert(0, getFirstNumber(i , inArray));
-                    }
-                }
-                System.out.println("Invoice in Progress: " + newIn.toString());
-                invoice = newIn.toString();
+            while (containsAOperator(invoice) && containsNotASingleNumber(invoice)) {
+                invoice = calculate(invoice).toString();
             }
 
             System.out.println("Ergebnis: " + invoice);
@@ -134,6 +24,99 @@ public class Calculate {
         } else
             return "ERROR";
 
+    }
+
+    private static StringBuilder calculate(String invoice) {
+        boolean stopCalculate = false;
+        StringBuilder newIn = new StringBuilder();
+        char[] inArray = invoice.toCharArray();
+
+
+        if (invoice.contains("/")) {
+            for (int i = 0; i < inArray.length; i++) {
+                switch (inArray[i]) {
+                    case '/' -> {
+                        newIn.append(doubleToString(Double.parseDouble(getNumber1(i, inArray).toString()) / Double.parseDouble(getNumber2(i, inArray).toString())));
+                        int nextOperator = getNextOperatorPostion(i, inArray);
+
+                        if(nextOperator != -1) {
+                            newIn.append(inArray[nextOperator]);
+                            i = nextOperator;
+                        } else {
+                            i = inArray.length;
+                        }
+
+                    }
+                    case '+', '-', '*' -> {
+                        if (i != 0) {
+                            newIn.append(getNumber1(i, inArray));
+                            newIn.append(inArray[i]);
+                        }
+                    }
+                    default -> {
+                        if (getNextOperatorPostion(i, inArray) == -1)
+                            newIn.append(inArray[i]);
+                    }
+                }
+            }
+        } else if (invoice.contains("*")) {
+            for (int i = 0; i < inArray.length; i++) {
+                switch (inArray[i]) {
+                    case '*' -> {
+                        newIn.append(doubleToString(Double.parseDouble(getNumber1(i, inArray).toString()) * Double.parseDouble(getNumber2(i, inArray).toString())));
+                        int nextOperator = getNextOperatorPostion(i, inArray);
+
+                        if(nextOperator != -1) {
+                            newIn.append(inArray[nextOperator]);
+                            i = nextOperator;
+                        } else {
+                            i = inArray.length;
+                        }
+
+                    }
+                    case '+', '-', '/' -> {
+                        if (i != 0) {
+                            newIn.append(getNumber1(i, inArray));
+                            newIn.append(inArray[i]);
+                        }
+                    }
+                    default -> {
+                        if (getNextOperatorPostion(i, inArray) == -1)
+                            newIn.append(inArray[i]);
+                    }
+                }
+            }
+        } else if (invoice.contains("+") || invoice.contains("-")) {
+            for (int i = 0; i < inArray.length; i++) {
+                if(inArray[i] == '+' && !stopCalculate) {
+                    newIn.append(doubleToString(Double.parseDouble(getNumber1(i, inArray).toString()) + Double.parseDouble(getNumber2(i, inArray).toString())));
+                    int nextOperator = getNextOperatorPostion(i, inArray);
+
+                    if(nextOperator != -1)
+                        i = nextOperator;
+                    else
+                        break;
+
+                    stopCalculate = true;
+                } else if(inArray[i] == '-' && !stopCalculate && i != 0) {
+                    newIn.append(doubleToString(Double.parseDouble(getNumber1(i, inArray).toString()) - Double.parseDouble(getNumber2(i, inArray).toString())));
+                    int nextOperator = getNextOperatorPostion(i, inArray);
+
+                    if(nextOperator != -1)
+                        i = nextOperator;
+                    else
+                        break;
+
+                    stopCalculate = true;
+                }
+                if(stopCalculate) {
+                    newIn.append(inArray[i]);
+                }
+            }
+        }
+
+        System.out.println("Invoice in Progress: " + newIn.toString());
+        return newIn;
     }
 
     private static StringBuilder getNumber1(int i, char[] invoiceArray) {
@@ -160,20 +143,9 @@ public class Calculate {
         return number2;
     }
 
-    private static StringBuilder getFirstNumber(int i, char[] invoiceArray) {
-        StringBuilder number = new StringBuilder();
-        for (int j = i; j < invoiceArray.length; j++) {
-            if (containsAOperator(invoiceArray[j] + ""))
-                break;
-            else
-                number.append(invoiceArray[j]);
-        }
-        return number;
-    }
-
     private static int getNextOperatorPostion(int i, char[] invoiceArray) {
         int nextOperatorPostion = -1;
-        for (int j = i - 1; j >= 0; j--) {
+        for (int j = i + 1; j < invoiceArray.length; j++) {
             if (containsAOperator(invoiceArray[j] + "") && j != 0) {
                 nextOperatorPostion = j;
                 break;
@@ -186,9 +158,9 @@ public class Calculate {
         return (s.contains("*") || s.contains("/") || s.contains("+") || s.contains("-"));
     }
 
-    private static boolean containsASingleNumber(String s) {
+    private static boolean containsNotASingleNumber(String s) {
         if (s.contains("*") || s.contains("/") || s.contains("+"))
-            return false;
+            return true;
 
         if (s.contains("-")) {
             if(s.startsWith("-")) {
@@ -197,14 +169,33 @@ public class Calculate {
                     if (c == '-')
                         i++;
                     if (i > 1)
-                        return false;
+                        return true;
                 }
-                return true;
-            } else
                 return false;
+            } else
+                return true;
         }
 
-        return true;
+        return false;
+    }
+    private static boolean isInputAInvoice(String s) {
+        if (containsAOperator(s) && containsNotASingleNumber(s) && !s.endsWith("+") && !s.endsWith("-") && !s.endsWith("*") && !s.endsWith("/")) {
+            char[] ia = s.toCharArray();
+            for (int i = 0; i < ia.length - 1; i++) {
+                if (containsAOperator(ia[i] + "")) {
+                    if (containsAOperator(ia[i + 1] + ""))
+                        return false;
+                } else if (ia[i] == '(') {
+                    for (int j = i; j < ia.length - 1; j++) {
+                        if (ia[j] == ')') {
+                            return ia[j - 1] != '(' && !containsAOperator(ia[j - 1] + "");
+                        }
+                    }
+                    return false;
+                }
+            }
+            return true;
+        } else return false;
     }
     private static String doubleToString(double d) {
         if (d % 1 != 0)
@@ -217,7 +208,7 @@ public class Calculate {
 /*
 Todo:
 
-ACHTUNG WICHTIGES PROBLEM: Im moment wird von rechts nach links gerechnet, jedoch ist das FALSCH. Sihe beispiel im Textdokument. Es muss von links nach Rechts gerechnet werden
+ACHTUNG WICHTIGES PROBLEM: Im moment wird von rechts nach links gerechnet, jedoch ist das FALSCH. Siehe beispiel im Textdokument. Es muss von links nach Rechts gerechnet werden
 
 #. Gleichzeichen automatisch am ende Entfernen damit kein Error entsteht.
 #. Überprüfung auf nicht autorisierte Zeichen ein fügen.

@@ -135,12 +135,6 @@ public class Main extends Application {
                 }
                 case "equals" -> {
                     b.setOnMousePressed(e -> {
-
-
-                        //Calculate.start("190/10+10/2*3-10+6*7-9+36/6+50/5*3");
-                        //Calculate.start("4+5+3");
-                        //calculate("12+1/2+3");
-
                         output.setText(Calculate.start(output.getText()));
                     });
                 }
@@ -151,9 +145,17 @@ public class Main extends Application {
                 }
                 case "delete" -> {
                     b.setOnMousePressed(e -> {
-
                         if(!output.getText().isEmpty())
                             output.setText(output.getText().substring(0, output.getText().length() - 1));
+                    });
+                }
+                case "negativ" -> {
+                    b.setOnMousePressed(e -> {
+                        if(output.getText().isEmpty())
+                            output.setText("-");
+                        else if(output.getText().equals("-"))
+                            output.setText("");
+
                     });
                 }
             }
@@ -195,13 +197,6 @@ public class Main extends Application {
         //Das gleiche, wenn man die das Fenster an den Rand schiebt und es sich automatisch ganz lang macht!
         stage.widthProperty().addListener(windowChange);
         stage.heightProperty().addListener(windowChange);
-
-        System.out.println("Test");
-        System.out.println("Double Max Value: " + Double.MAX_VALUE);
-        System.out.println("Prozen Symbol: " + -34204 % 1);
-        String d = "Hall o o o";
-        System.out.println("Vor trim: " + d);
-        System.out.println("Nach replaceAll: " + d.replaceAll(" ", ""));
 
         root.getChildren().addAll(allButtons);
         root.getChildren().add(textField);
